@@ -1,0 +1,23 @@
+#!/bin/bash 
+CACHE_DIR=/tmp/docker-get
+GITREPO=$1
+CWD=$(dirname $0)
+GITDIR=$CACHE_DIR/${GITREPO}
+
+if [ "$1" == "" ]; then
+	echo "Usage: docker-get user/repository"
+	exit 1
+fi
+
+if [ -d ${GITDIR} ]; then
+	cd ${GITDIR}
+	git pull
+else 
+	mkdir -p $CACHE_DIR $GITDIR
+	git clone https://github.com/${GITREPO}.git ${GITDIR}
+fi
+
+
+cd ${GITDIR}
+docker build -t $(whoami)/$(echo $GITREPO | awk -F '/' '{ print $2; }') .
+
